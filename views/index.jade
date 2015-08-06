@@ -1,6 +1,8 @@
-extends layout
+extends chat-layout
 
 block content
+  h3  Server: #{server}
+  h3  Username : #{username}
   ul#messages
   form
     input#m(autocomplete="off")

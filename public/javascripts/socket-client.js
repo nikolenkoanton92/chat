@@ -10,4 +10,13 @@ $(document).ready(function() {
   socket.on('chat message', function(msg) {
     $('#messages').append($('<li>').text(msg));
   });
+
+  socket.on('connected', function(msg) {
+    $('#messages').append($('<li>').text(msg));
+  });
+
+  socket.on('disconnected', function(msg) {
+    console.log(1)
+    $('#messages').append($('<li>').text(msg));
+  });
 });
