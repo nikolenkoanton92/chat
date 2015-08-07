@@ -3,6 +3,9 @@ extends chat-layout
 block content
   h3  Server: #{server}
   h3  Username : #{username}
+  h4  Users Online:
+  ul#online-list
+  h4  Messages :
   ul#messages
   form
     input#m(autocomplete="off")
