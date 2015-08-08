@@ -1,5 +1,6 @@
 $(document).ready(function() {
-  var socket = io().connect('http://localhost/anton');
+  var room = window.location.pathname;
+  var socket = io('/project-chat'); //io('/anton');
 
   $('form').submit(function() {
     socket.emit('chat message', $('#m').val());
@@ -7,14 +8,14 @@ $(document).ready(function() {
     return false;
   });
 
-  socket.on('chat message', function(msg) {
+  socket.emit('join:to:room', room);
+
+  socket.on('message', function(msg) {
     $('#messages').append($('<li>').text(msg));
   });
 
   socket.on('connected', function(message) {
     var msg = JSON.parse(message);
-    console.log(msg)
-    console.log(msg.username)
     $('#messages').append($('<li>').text(msg.message));
     $('#online-list').append($('<li>').text(msg.username));
   });
@@ -30,7 +31,6 @@ $(document).ready(function() {
     console.log('error : ', err);
   });
   socket.on('disconnected', function(msg) {
-    // $('#messages').append($('<li>').text(msg));
     $('#messages').append($('<li>').text(msg.username + ' :' + ' ' + msg.message));
   });
 });

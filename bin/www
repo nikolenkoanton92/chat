@@ -14,7 +14,7 @@ var SessionSockets = require('session.socket.io');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '80');
 app.set('port', port);
 
 /**
@@ -28,45 +28,20 @@ var server = http.createServer(app);
  **/
 
 var io = require('socket.io')(server);
+var socketServer = require('../modules/socket-server')(io, app);
 
-
-var ios = require('socket.io-express-session');
-io.use(ios(app.session));
-io.of('/anton').use(function(socket, next) {
-  var handshakeData = socket.request;
-  next();
-});
-
-
-io.on('connection', function(socket) {
-  var username = socket.handshake.session.username;
-  console.log('user connected');
-
-  var connectedWelcomeUser = JSON.stringify({
-    username: username,
-    message: 'Welcome ' + username + ' to the chat'
-  });
-
-  var connectedNewUser = JSON.stringify({
-    username: username,
-    message: 'New User ' + username + ' Come to Chat'
-  });
-
-  socket.emit('connected', connectedWelcomeUser);
-  socket.broadcast.emit('connected', connectedNewUser);
-
-  socket.on('disconnect', function() {
-    console.log('user disconnected');
-    io.emit('offline', username);
-    io.emit('disconnected', 'User ' + username + ' disconected ');
-  });
-
-  socket.on('chat message', function(msg) {
-    var message = username + ':' + ' ' + msg;
-    io.emit('chat message', message);
-  });
-
-
+app.get('/:nsp', function(req, res) {
+  var server = process.env.VCAP_APP_HOST ? process.env.VCAP_APP_HOST + ":" + process.env.VCAP_APP_PORT : 'localhost:3000';
+  if (req.session.username) {
+    var username = req.session.username;
+    res.render('index', {
+      title: 'Express',
+      server: server,
+      username: username
+    });
+  } else {
+    res.redirect('/login');
+  }
 });
 
 /**
